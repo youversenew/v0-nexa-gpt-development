@@ -8,19 +8,18 @@ export async function POST(req: Request) {
   try {
     const { messages, systemPrompt, images, useGroq = false } = await req.json()
 
+    /* =========================
+       GROQ (text only)
+    ========================== */
     if (useGroq && (!images || images.length === 0)) {
-      // Use Groq with thinking visible
       const completion = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [
           {
             role: "system",
-            content: systemPrompt || "Sen NexaGPT - foydali va professional AI yordamchisan.",
+            content: systemPrompt || "Sen NexaGPT – foydali va professional AI yordamchisan.",
           },
-          ...messages.map((msg: { role: string; content: string }) => ({
-            role: msg.role,
-            content: msg.content,
-          })),
+          ...messages,
         ],
         temperature: 0.7,
         max_tokens: 4096,
@@ -28,20 +27,22 @@ export async function POST(req: Request) {
       })
 
       const encoder = new TextEncoder()
+
       const stream = new ReadableStream({
         async start(controller) {
           try {
             for await (const chunk of completion) {
               const content = chunk.choices[0]?.delta?.content
               if (content) {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ content })}\n\n`)
+                )
               }
             }
             controller.enqueue(encoder.encode("data: [DONE]\n\n"))
             controller.close()
-          } catch (error) {
-            console.error("[v0] Groq stream error:", error)
-            controller.error(error)
+          } catch (e) {
+            controller.error(e)
           }
         },
       })
@@ -55,13 +56,13 @@ export async function POST(req: Request) {
       })
     }
 
-    // TUZATISH: systemInstruction getGenerativeModel ichiga ko'chirildi va formatlandi
+    /* =========================
+       GEMINI
+    ========================== */
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-exp",
-      systemInstruction: {
-        parts: [{ text: systemPrompt || "Sen NexaGPT - foydali va professional AI yordamchisan. Javoblaringni markdown formatida yoz." }],
-        role: "system"
-      },
+      model: "gemini-2.5-flash",
+      systemInstruction: systemPrompt ||
+        "Sen NexaGPT – foydali va professional AI yordamchisan. Markdown formatida yoz.",
       safetySettings: [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
         { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -70,35 +71,33 @@ export async function POST(req: Request) {
       ],
     })
 
-    const history = messages.slice(0, -1).map((msg: { role: string; content: string }) => ({
-      role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
+    const history = messages.slice(0, -1).map((m: any) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
     }))
 
-    // TUZATISH: startChat ichidan systemInstruction olib tashlandi (u endi model konfiguratsiyasida)
     const chat = model.startChat({
       history,
       generationConfig: {
-        maxOutputTokens: 8192,
         temperature: 0.7,
+        maxOutputTokens: 8192,
       },
     })
 
-    const lastMessage = messages[messages.length - 1]
-    const prompt = lastMessage.content
+    const last = messages[messages.length - 1]
 
-    let parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }> = [{ text: prompt }]
+    let parts: any[] = [{ text: last.content }]
 
-    if (images && images.length > 0) {
+    if (images?.length) {
       parts = [
-        { text: prompt },
+        { text: last.content },
         ...images.map((img: string) => {
-          const base64Data = img.split(",")[1] || img
+          const base64 = img.split(",")[1] ?? img
+          const mimeType =
+            img.startsWith("data:image/png") ? "image/png" : "image/jpeg"
+
           return {
-            inlineData: {
-              mimeType: img.startsWith("data:image/png") ? "image/png" : "image/jpeg",
-              data: base64Data,
-            },
+            inlineData: { data: base64, mimeType },
           }
         }),
       ]
@@ -107,20 +106,22 @@ export async function POST(req: Request) {
     const result = await chat.sendMessageStream(parts)
 
     const encoder = new TextEncoder()
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
           for await (const chunk of result.stream) {
             const text = chunk.text()
-            if (text) {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: text })}\n\n`))
+            if (text && text.trim()) {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ content: text })}\n\n`)
+              )
             }
           }
           controller.enqueue(encoder.encode("data: [DONE]\n\n"))
           controller.close()
-        } catch (error) {
-          console.error("[v0] Gemini stream error:", error)
-          controller.error(error)
+        } catch (e) {
+          controller.error(e)
         }
       },
     })
@@ -132,17 +133,13 @@ export async function POST(req: Request) {
         Connection: "keep-alive",
       },
     })
-  } catch (error) {
-    console.error("[v0] Chat API error:", error)
+  } catch (error: any) {
     return new Response(
       JSON.stringify({
         error: "Failed to generate response",
-        details: error instanceof Error ? error.message : "Unknown error",
+        details: error?.message || "Unknown error",
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
+      { status: 500 }
     )
   }
 }

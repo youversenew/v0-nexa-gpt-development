@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     // Xavfsizlik sozlamalari (Safety Settings) qo'shildi, 
     // aks holda model oddiy matnlarni ham bloklashi mumkin.
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.0-flash",
       safetySettings: [
         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
         { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },

@@ -1,58 +1,73 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { translations, type Language, type TranslationKey } from "@/lib/i18n"
-import { useAuth } from "./auth-context"
-import { getSupabaseBrowserClient } from "@/lib/supabase/client"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+  useMemo,
+} from "react";
+import { translations, type Language, type TranslationKey } from "@/lib/i18n";
+import { useAuth } from "./auth-context";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface LanguageContextType {
-  language: Language
-  setLanguage: (lang: Language) => void
-  t: (key: TranslationKey) => string
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: TranslationKey) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("uz")
-  const { user } = useAuth()
-  const supabase = getSupabaseBrowserClient()
+  const [language, setLanguageState] = useState<Language>("uz");
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
 
   useEffect(() => {
-    if (user) {
+    // Auth yuklanishini kutamiz
+    if (!isAuthLoading && user) {
       const loadLanguage = async () => {
-        const { data } = await supabase.from("profiles").select("language").eq("id", user.id).single()
+        const { data } = await supabase
+          .from("profiles")
+          .select("language")
+          .eq("id", user.id)
+          .single();
         if (data?.language) {
-          setLanguageState(data.language as Language)
+          setLanguageState(data.language as Language);
         }
-      }
-      loadLanguage()
+      };
+      loadLanguage();
     }
-  }, [user, supabase])
+  }, [user, isAuthLoading, supabase]);
 
   const setLanguage = async (lang: Language) => {
-    setLanguageState(lang)
+    setLanguageState(lang);
     if (user) {
-      await supabase.from("profiles").update({ language: lang }).eq("id", user.id)
+      await supabase.from("profiles").update({ language: lang }).eq("id", user.id);
     }
-  }
+  };
 
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || translations.uz[key] || key
-  }
+    return translations[language][key] || translations.uz[key] || key;
+  };
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext)
-  // Return default values during SSR instead of throwing error
+  const context = useContext(LanguageContext);
   if (!context) {
     return {
       language: "uz" as Language,
       setLanguage: () => {},
       t: (key: TranslationKey) => translations.uz[key] || key,
-    }
+    };
   }
-  return context
+  return context;
 }
