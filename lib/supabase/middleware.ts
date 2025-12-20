@@ -3,30 +3,34 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  // 1. Dastlabki response obyektini yaratamiz
+  // 1. Dastlabki response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
+  // 2. Supabase klientini yaratamiz (ANON KEY bilan)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // O'ZGARTIRILDI: Faqat ANON KEY
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Bu yerda sehr yuz beradi: yangilangan cookielarni
-          // ham Request, ham Response ga yozamiz
-          cookiesToSet.forEach(({ name, value, options }) => {
+          // Cookielarni requestga yozamiz
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
+          
+          // Responseni yangilaymiz
           response = NextResponse.next({
             request,
           });
+
+          // Cookielarni responsega ham yozamiz
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -35,12 +39,12 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // 2. Auth user holatini tekshiramiz (bu token yangilanishini ham amalga oshiradi)
+  // 3. Foydalanuvchini tekshiramiz
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 3. Himoyalangan yo'llar (Protected Routes)
+  // 4. Himoyalangan yo'llar
   const protectedPaths = ["/chat", "/settings", "/account"];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
@@ -52,7 +56,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 4. Auth sahifalari (Login qilgan foydalanuvchi qaytib kirmasligi uchun)
+  // 5. Auth sahifalari (Login/Signup)
   const authPaths = ["/login", "/signup"];
   const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
@@ -64,6 +68,5 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 5. Eng muhimi: yangilangan cookielar bilan responseni qaytaramiz
   return response;
 }

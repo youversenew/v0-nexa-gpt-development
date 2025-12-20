@@ -12,7 +12,7 @@ export function getSupabaseBrowserClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Supabase URL va Key .env faylida topilmadi");
+    throw new Error("Supabase URL va ANON KEY .env faylida topilmadi");
   }
 
   browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);

@@ -26,35 +26,37 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 async function updateSession(request) {
-    // 1. Dastlabki response obyektini yaratamiz
+    // 1. Dastlabki response
     let response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
         request: {
             headers: request.headers
         }
     });
+    // 2. Supabase klientini yaratamiz (ANON KEY bilan)
     const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co"), ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5cHdlcXBmanBwa3N6anZveXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMzMxNjcsImV4cCI6MjA4MTYwOTE2N30.bJPV8KYrmKNsO7Bv2bpgCtO9zBsCTAJ8Nxb2VnJTaIU"), {
         cookies: {
             getAll () {
                 return request.cookies.getAll();
             },
             setAll (cookiesToSet) {
-                // Bu yerda sehr yuz beradi: yangilangan cookielarni
-                // ham Request, ham Response ga yozamiz
-                cookiesToSet.forEach(({ name, value, options })=>{
+                // Cookielarni requestga yozamiz
+                cookiesToSet.forEach(({ name, value })=>{
                     request.cookies.set(name, value);
                 });
+                // Responseni yangilaymiz
                 response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
                     request
                 });
+                // Cookielarni responsega ham yozamiz
                 cookiesToSet.forEach(({ name, value, options })=>{
                     response.cookies.set(name, value, options);
                 });
             }
         }
     });
-    // 2. Auth user holatini tekshiramiz (bu token yangilanishini ham amalga oshiradi)
+    // 3. Foydalanuvchini tekshiramiz
     const { data: { user } } = await supabase.auth.getUser();
-    // 3. Himoyalangan yo'llar (Protected Routes)
+    // 4. Himoyalangan yo'llar
     const protectedPaths = [
         "/chat",
         "/settings",
@@ -66,7 +68,7 @@ async function updateSession(request) {
         url.pathname = "/login";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(url);
     }
-    // 4. Auth sahifalari (Login qilgan foydalanuvchi qaytib kirmasligi uchun)
+    // 5. Auth sahifalari (Login/Signup)
     const authPaths = [
         "/login",
         "/signup"
@@ -77,7 +79,6 @@ async function updateSession(request) {
         url.pathname = "/chat";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(url);
     }
-    // 5. Eng muhimi: yangilangan cookielar bilan responseni qaytaramiz
     return response;
 }
 }),

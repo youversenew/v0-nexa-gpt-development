@@ -7,7 +7,7 @@ export async function createClient() {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // Faqat ANON KEY
     {
       cookies: {
         getAll() {
@@ -19,9 +19,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Server Componentlarda cookie yozish taqiqlangan, 
-            // bu faqat Server Actionlarda yoki Middleware orqali ishlaydi.
-            // Xatoni yutib yuboramiz.
+            // Server Componentlarda cookie yozish mumkin emasligi sababli xatoni yutamiz
           }
         },
       },
