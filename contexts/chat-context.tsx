@@ -9,6 +9,7 @@ import {
   useCallback,
   useMemo,
 } from "react";
+import { toast } from "sonner";
 import type { Message, Conversation, Module } from "@/lib/types";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
@@ -32,9 +33,23 @@ interface ChatContextType {
   clearAllConversations: () => Promise<void>;
   setIsLoading: (loading: boolean) => void;
   goHome: () => void;
+  downloadChatHistory: (conversationId: string) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+// Simple UUID generator fallback
+function uuidv4() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c: any) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
+}
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const [modules, setModules] = useState<Module[]>([]);
@@ -157,11 +172,50 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     await supabase.from("conversations").delete().eq("user_id", user.id);
     setConversations([]);
     goHome();
+    goHome();
   }, [user, supabase, goHome]);
+
+  const downloadChatHistory = useCallback(async (conversationId: string) => {
+    try {
+      const { data: messages } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .order("created_at");
+
+      if (!messages || messages.length === 0) {
+        toast.error("No messages to download");
+        return;
+      }
+
+      const conversation = conversations.find(c => c.id === conversationId);
+      const title = conversation?.custom_title || conversation?.title || "chat-history";
+
+      const content = messages.map((m: any) => `[${new Date(m.created_at).toLocaleString()}] ${m.role.toUpperCase()}:\n${m.content}\n`).join("\n---\n\n");
+
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("Chat history downloaded");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download chat history");
+    }
+  }, [supabase, conversations]);
 
   const sendMessage = useCallback(
     async (content: string, images?: string[]) => {
-      if (!user) return;
+      if (!user) {
+        toast.error("Please login to send messages")
+        return;
+      }
 
       let conversationId = currentConversation?.id;
 
@@ -180,12 +234,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           conversationId = data.id;
           setConversations((prev) => [data, ...prev]);
           setCurrentConversation(data);
-        } else return;
+        } else {
+          toast.error("Failed to create new conversation")
+          return;
+        }
       }
 
       const userMessage: Message = {
-        id: crypto.randomUUID(),
-        conversation_id: conversationId,
+        id: uuidv4(),
+        conversation_id: conversationId!,
         role: "user",
         content,
         metadata: images ? { images } : undefined,
@@ -223,11 +280,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           );
         } catch {
           const fallbackTitle =
-            content.slice(0, 50) + (content.length > 50 ? "..." : "");
+            content.slice(0, 30) + (content.length > 30 ? "..." : "");
           await supabase
             .from("conversations")
             .update({ title: fallbackTitle })
             .eq("id", conversationId);
+
+          setConversations((prev) =>
+            prev.map((c) => (c.id === conversationId ? { ...c, title: fallbackTitle } : c))
+          );
+          setCurrentConversation((prev) =>
+            prev ? { ...prev, title: fallbackTitle } : null
+          );
         }
       }
 
@@ -258,8 +322,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         const decoder = new TextDecoder();
 
         const assistantMessage: Message = {
-          id: crypto.randomUUID(),
-          conversation_id: conversationId,
+          id: uuidv4(),
+          conversation_id: conversationId!,
           role: "assistant",
           content: "",
           created_at: new Date().toISOString(),
@@ -307,10 +371,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         });
       } catch (error) {
         console.error("[v0] Chat error:", error);
+        toast.error("Failed to send message: " + (error as Error).message)
         setMessages((prev) => [
           ...prev,
           {
-            id: crypto.randomUUID(),
+            id: uuidv4(),
             conversation_id: conversationId!,
             role: "assistant",
             content:
@@ -344,6 +409,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         clearAllConversations,
         setIsLoading,
         goHome,
+        downloadChatHistory,
       }}
     >
       {children}

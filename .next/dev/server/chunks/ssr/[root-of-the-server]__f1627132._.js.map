@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/KOMPYUTER_01/v0-nexa-gpt-development/app/page.tsx"],"sourcesContent":["import { redirect } from \"next/navigation\"\r\nimport { createClient } from \"@/lib/supabase/server\"\r\n\r\nexport default async function Home() {\r\n  const supabase = await getSupabaseServerClient()\r\n  const {\r\n    data: { user },\r\n  } = await supabase.auth.getUser()\r\n\r\n  if (user) {\r\n    redirect(\"/chat\")\r\n  } else {\r\n    redirect(\"/login\")\r\n  }\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAGe,eAAe;IAC5B,MAAM,WAAW,MAAM;IACvB,MAAM,EACJ,MAAM,EAAE,IAAI,EAAE,EACf,GAAG,MAAM,SAAS,IAAI,CAAC,OAAO;IAE/B,IAAI,MAAM;QACR,IAAA,iMAAQ,EAAC;IACX,OAAO;QACL,IAAA,iMAAQ,EAAC;IACX;AACF"}}]
+}

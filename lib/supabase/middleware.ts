@@ -1,36 +1,28 @@
-// lib/supabase/middleware.ts
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  // 1. Dastlabki response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // 2. Supabase klientini yaratamiz (ANON KEY bilan)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // O'ZGARTIRILDI: Faqat ANON KEY
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Cookielarni requestga yozamiz
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
-          
-          // Responseni yangilaymiz
           response = NextResponse.next({
             request,
           });
-
-          // Cookielarni responsega ham yozamiz
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -39,30 +31,21 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // 3. Foydalanuvchini tekshiramiz
+  // IMPORTANT: DO NOT REMOVE auth.getUser()
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 4. Himoyalangan yo'llar
-  const protectedPaths = ["/chat", "/settings", "/account"];
-  const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
+  const isAuthPage = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/signup");
+  const isProtectedPage = request.nextUrl.pathname.startsWith("/chat") || request.nextUrl.pathname.startsWith("/account");
 
-  if (isProtectedPath && !user) {
+  if (!user && isProtectedPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // 5. Auth sahifalari (Login/Signup)
-  const authPaths = ["/login", "/signup"];
-  const isAuthPath = authPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
-
-  if (isAuthPath && user) {
+  if (user && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/chat";
     return NextResponse.redirect(url);

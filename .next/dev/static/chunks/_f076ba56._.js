@@ -10,6 +10,7 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/sonner/dist/index.mjs [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$client$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/supabase/client.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/contexts/auth-context.tsx [app-client] (ecmascript)");
 ;
@@ -18,7 +19,15 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
+;
 const ChatContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(undefined);
+// Simple UUID generator fallback
+function uuidv4() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c)=>(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+}
 function ChatProvider({ children }) {
     _s();
     const [modules, setModules] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -168,15 +177,57 @@ function ChatProvider({ children }) {
             await supabase.from("conversations").delete().eq("user_id", user.id);
             setConversations([]);
             goHome();
+            goHome();
         }
     }["ChatProvider.useCallback[clearAllConversations]"], [
         user,
         supabase,
         goHome
     ]);
+    const downloadChatHistory = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ChatProvider.useCallback[downloadChatHistory]": async (conversationId)=>{
+            try {
+                const { data: messages } = await supabase.from("messages").select("*").eq("conversation_id", conversationId).order("created_at");
+                if (!messages || messages.length === 0) {
+                    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error("No messages to download");
+                    return;
+                }
+                const conversation = conversations.find({
+                    "ChatProvider.useCallback[downloadChatHistory].conversation": (c)=>c.id === conversationId
+                }["ChatProvider.useCallback[downloadChatHistory].conversation"]);
+                const title = conversation?.custom_title || conversation?.title || "chat-history";
+                const content = messages.map({
+                    "ChatProvider.useCallback[downloadChatHistory].content": (m)=>`[${new Date(m.created_at).toLocaleString()}] ${m.role.toUpperCase()}:\n${m.content}\n`
+                }["ChatProvider.useCallback[downloadChatHistory].content"]).join("\n---\n\n");
+                const blob = new Blob([
+                    content
+                ], {
+                    type: "text/plain"
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].success("Chat history downloaded");
+            } catch (error) {
+                console.error("Download error:", error);
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error("Failed to download chat history");
+            }
+        }
+    }["ChatProvider.useCallback[downloadChatHistory]"], [
+        supabase,
+        conversations
+    ]);
     const sendMessage = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ChatProvider.useCallback[sendMessage]": async (content, images)=>{
-            if (!user) return;
+            if (!user) {
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error("Please login to send messages");
+                return;
+            }
             let conversationId = currentConversation?.id;
             if (!conversationId) {
                 const { data } = await supabase.from("conversations").insert({
@@ -193,10 +244,13 @@ function ChatProvider({ children }) {
                             ]
                     }["ChatProvider.useCallback[sendMessage]"]);
                     setCurrentConversation(data);
-                } else return;
+                } else {
+                    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error("Failed to create new conversation");
+                    return;
+                }
             }
             const userMessage = {
-                id: crypto.randomUUID(),
+                id: uuidv4(),
                 conversation_id: conversationId,
                 role: "user",
                 content,
@@ -249,10 +303,24 @@ function ChatProvider({ children }) {
                             } : null
                     }["ChatProvider.useCallback[sendMessage]"]);
                 } catch  {
-                    const fallbackTitle = content.slice(0, 50) + (content.length > 50 ? "..." : "");
+                    const fallbackTitle = content.slice(0, 30) + (content.length > 30 ? "..." : "");
                     await supabase.from("conversations").update({
                         title: fallbackTitle
                     }).eq("id", conversationId);
+                    setConversations({
+                        "ChatProvider.useCallback[sendMessage]": (prev)=>prev.map({
+                                "ChatProvider.useCallback[sendMessage]": (c)=>c.id === conversationId ? {
+                                        ...c,
+                                        title: fallbackTitle
+                                    } : c
+                            }["ChatProvider.useCallback[sendMessage]"])
+                    }["ChatProvider.useCallback[sendMessage]"]);
+                    setCurrentConversation({
+                        "ChatProvider.useCallback[sendMessage]": (prev)=>prev ? {
+                                ...prev,
+                                title: fallbackTitle
+                            } : null
+                    }["ChatProvider.useCallback[sendMessage]"]);
                 }
             }
             setIsStreaming(true);
@@ -286,7 +354,7 @@ function ChatProvider({ children }) {
                 const reader = response.body?.getReader();
                 const decoder = new TextDecoder();
                 const assistantMessage = {
-                    id: crypto.randomUUID(),
+                    id: uuidv4(),
                     conversation_id: conversationId,
                     role: "assistant",
                     content: "",
@@ -334,11 +402,12 @@ function ChatProvider({ children }) {
                 });
             } catch (error) {
                 console.error("[v0] Chat error:", error);
+                __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$sonner$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toast"].error("Failed to send message: " + error.message);
                 setMessages({
                     "ChatProvider.useCallback[sendMessage]": (prev)=>[
                             ...prev,
                             {
-                                id: crypto.randomUUID(),
+                                id: uuidv4(),
                                 conversation_id: conversationId,
                                 role: "assistant",
                                 content: "Kechirasiz, xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.",
@@ -375,16 +444,17 @@ function ChatProvider({ children }) {
             renameConversation,
             clearAllConversations,
             setIsLoading,
-            goHome
+            goHome,
+            downloadChatHistory
         },
         children: children
     }, void 0, false, {
         fileName: "[project]/contexts/chat-context.tsx",
-        lineNumber: 329,
+        lineNumber: 394,
         columnNumber: 5
     }, this);
 }
-_s(ChatProvider, "U8youTgw6PuOBpDV59G7H3zkaio=", false, function() {
+_s(ChatProvider, "SlAgpaTxykwJbpu5uatnoli6WTY=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];
@@ -457,6 +527,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bot$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bot$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/bot.js [app-client] (ecmascript) <export default as Bot>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pen$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/pen.js [app-client] (ecmascript) <export default as Edit2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$globe$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Globe$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/globe.js [app-client] (ecmascript) <export default as Globe>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$download$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Download$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/download.js [app-client] (ecmascript) <export default as Download>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/utils.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 ;
@@ -481,7 +552,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
     _s();
     const { theme, toggleTheme } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$theme$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTheme"])();
     const { language, setLanguage, t } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$language$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useLanguage"])();
-    const { modules, conversations, currentConversation, createNewConversation, selectConversation, deleteConversation, renameConversation } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$chat$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useChat"])();
+    const { modules, conversations, currentConversation, createNewConversation, selectConversation, deleteConversation, renameConversation, downloadChatHistory } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$chat$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useChat"])();
     const { signOut, profile } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const [moreModulesOpen, setMoreModulesOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -519,7 +590,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                 onClick: onToggle
             }, void 0, false, {
                 fileName: "[project]/components/sidebar.tsx",
-                lineNumber: 103,
+                lineNumber: 105,
                 columnNumber: 18
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -533,7 +604,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                 children: "NexaGPT"
                             }, void 0, false, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 114,
+                                lineNumber: 116,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -543,18 +614,18 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                     className: "h-5 w-5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/sidebar.tsx",
-                                    lineNumber: 116,
+                                    lineNumber: 118,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 115,
+                                lineNumber: 117,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/sidebar.tsx",
-                        lineNumber: 113,
+                        lineNumber: 115,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -567,19 +638,19 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                     className: "h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/components/sidebar.tsx",
-                                    lineNumber: 126,
+                                    lineNumber: 128,
                                     columnNumber: 13
                                 }, this),
                                 t("newChat")
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/sidebar.tsx",
-                            lineNumber: 122,
+                            lineNumber: 124,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/sidebar.tsx",
-                        lineNumber: 121,
+                        lineNumber: 123,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -602,31 +673,31 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                     className: "h-4 w-4 text-white"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/sidebar.tsx",
-                                                    lineNumber: 149,
+                                                    lineNumber: 151,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 145,
+                                                lineNumber: 147,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: module.name
                                             }, void 0, false, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 151,
+                                                lineNumber: 153,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, module.slug, true, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 138,
+                                        lineNumber: 140,
                                         columnNumber: 17
                                     }, this);
                                 })
                             }, void 0, false, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 134,
+                                lineNumber: 136,
                                 columnNumber: 11
                             }, this),
                             moreModules.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -640,26 +711,26 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                 children: t("moreModules")
                                             }, void 0, false, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 164,
+                                                lineNumber: 166,
                                                 columnNumber: 17
                                             }, this),
                                             moreModulesOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                 className: "h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 167,
                                                 columnNumber: 36
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                 className: "h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 167,
                                                 columnNumber: 74
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 160,
+                                        lineNumber: 162,
                                         columnNumber: 15
                                     }, this),
                                     moreModulesOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -676,44 +747,44 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                                 children: "{ }"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/sidebar.tsx",
-                                                                lineNumber: 179,
+                                                                lineNumber: 181,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: module.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/sidebar.tsx",
-                                                                lineNumber: 180,
+                                                                lineNumber: 182,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/sidebar.tsx",
-                                                        lineNumber: 178,
+                                                        lineNumber: 180,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                         className: "h-4 w-4 text-muted-foreground"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/sidebar.tsx",
-                                                        lineNumber: 182,
+                                                        lineNumber: 184,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, module.slug, true, {
                                                 fileName: "[project]/components/sidebar.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 173,
                                                 columnNumber: 21
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 169,
+                                        lineNumber: 171,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 159,
+                                lineNumber: 161,
                                 columnNumber: 13
                             }, this),
                             conversations.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -724,7 +795,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         children: t("recent")
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 193,
+                                        lineNumber: 195,
                                         columnNumber: 15
                                     }, this),
                                     conversations.slice(0, 15).map((conversation)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -747,12 +818,12 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                         autoFocus: true
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/sidebar.tsx",
-                                                        lineNumber: 203,
+                                                        lineNumber: 205,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/sidebar.tsx",
-                                                    lineNumber: 202,
+                                                    lineNumber: 204,
                                                     columnNumber: 21
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                     onClick: ()=>selectConversation(conversation.id),
@@ -762,7 +833,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                             className: "h-4 w-4 shrink-0 text-muted-foreground"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/sidebar.tsx",
-                                                            lineNumber: 224,
+                                                            lineNumber: 226,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -770,13 +841,13 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                             children: conversation.custom_title || conversation.title
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/sidebar.tsx",
-                                                            lineNumber: 225,
+                                                            lineNumber: 227,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/sidebar.tsx",
-                                                    lineNumber: 217,
+                                                    lineNumber: 219,
                                                     columnNumber: 21
                                                 }, this),
                                                 hoveredConversation === conversation.id && editingConversation !== conversation.id && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -793,12 +864,31 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                                 className: "h-3.5 w-3.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/sidebar.tsx",
-                                                                lineNumber: 239,
+                                                                lineNumber: 241,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/sidebar.tsx",
-                                                            lineNumber: 231,
+                                                            lineNumber: 233,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            onClick: (e)=>{
+                                                                e.stopPropagation();
+                                                                downloadChatHistory(conversation.id);
+                                                            },
+                                                            className: "rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground",
+                                                            title: "Download history",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$download$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Download$3e$__["Download"], {
+                                                                className: "h-3.5 w-3.5"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/sidebar.tsx",
+                                                                lineNumber: 251,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/sidebar.tsx",
+                                                            lineNumber: 243,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -812,36 +902,36 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                                                 className: "h-3.5 w-3.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/sidebar.tsx",
-                                                                lineNumber: 249,
+                                                                lineNumber: 261,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/sidebar.tsx",
-                                                            lineNumber: 241,
+                                                            lineNumber: 253,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/sidebar.tsx",
-                                                    lineNumber: 230,
+                                                    lineNumber: 232,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, conversation.id, true, {
                                             fileName: "[project]/components/sidebar.tsx",
-                                            lineNumber: 195,
+                                            lineNumber: 197,
                                             columnNumber: 17
                                         }, this))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 192,
+                                lineNumber: 194,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/sidebar.tsx",
-                        lineNumber: 132,
+                        lineNumber: 134,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -855,7 +945,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 265,
+                                        lineNumber: 277,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -863,7 +953,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         children: t("search")
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 266,
+                                        lineNumber: 278,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("kbd", {
@@ -871,13 +961,13 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         children: "⌘K"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 267,
+                                        lineNumber: 279,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 261,
+                                lineNumber: 273,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -888,7 +978,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 274,
+                                        lineNumber: 286,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -896,13 +986,13 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         children: language === "uz" ? "O'zbekcha" : "English"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 287,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 270,
+                                lineNumber: 282,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -914,7 +1004,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                             className: "h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/components/sidebar.tsx",
-                                            lineNumber: 284,
+                                            lineNumber: 296,
                                             columnNumber: 17
                                         }, this),
                                         t("darkMode")
@@ -925,7 +1015,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                             className: "h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/components/sidebar.tsx",
-                                            lineNumber: 289,
+                                            lineNumber: 301,
                                             columnNumber: 17
                                         }, this),
                                         t("lightMode")
@@ -933,7 +1023,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                 }, void 0, true)
                             }, void 0, false, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 278,
+                                lineNumber: 290,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -944,7 +1034,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 311,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -952,13 +1042,13 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         children: profile?.full_name || t("account")
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 300,
+                                        lineNumber: 312,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 295,
+                                lineNumber: 307,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -969,14 +1059,14 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 307,
+                                        lineNumber: 319,
                                         columnNumber: 13
                                     }, this),
                                     t("settings")
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 303,
+                                lineNumber: 315,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -986,14 +1076,14 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 312,
+                                        lineNumber: 324,
                                         columnNumber: 13
                                     }, this),
                                     "Updates & FAQ"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 311,
+                                lineNumber: 323,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1004,26 +1094,26 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                         className: "h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/components/sidebar.tsx",
-                                        lineNumber: 320,
+                                        lineNumber: 332,
                                         columnNumber: 13
                                     }, this),
                                     t("logout")
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/sidebar.tsx",
-                                lineNumber: 316,
+                                lineNumber: 328,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/sidebar.tsx",
-                        lineNumber: 260,
+                        lineNumber: 272,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/sidebar.tsx",
-                lineNumber: 106,
+                lineNumber: 108,
                 columnNumber: 7
             }, this),
             !isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1033,12 +1123,12 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                     className: "h-5 w-5"
                 }, void 0, false, {
                     fileName: "[project]/components/sidebar.tsx",
-                    lineNumber: 329,
+                    lineNumber: 341,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/sidebar.tsx",
-                lineNumber: 328,
+                lineNumber: 340,
                 columnNumber: 9
             }, this),
             deleteConfirm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1051,7 +1141,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                             children: t("delete")
                         }, void 0, false, {
                             fileName: "[project]/components/sidebar.tsx",
-                            lineNumber: 336,
+                            lineNumber: 348,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1059,7 +1149,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                             children: t("deleteWarning")
                         }, void 0, false, {
                             fileName: "[project]/components/sidebar.tsx",
-                            lineNumber: 337,
+                            lineNumber: 349,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1071,7 +1161,7 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                     children: t("cancel")
                                 }, void 0, false, {
                                     fileName: "[project]/components/sidebar.tsx",
-                                    lineNumber: 339,
+                                    lineNumber: 351,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1080,30 +1170,30 @@ function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpenAccount
                                     children: t("delete")
                                 }, void 0, false, {
                                     fileName: "[project]/components/sidebar.tsx",
-                                    lineNumber: 345,
+                                    lineNumber: 357,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/sidebar.tsx",
-                            lineNumber: 338,
+                            lineNumber: 350,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/sidebar.tsx",
-                    lineNumber: 335,
+                    lineNumber: 347,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/sidebar.tsx",
-                lineNumber: 334,
+                lineNumber: 346,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true);
 }
-_s(Sidebar, "NOk/YSpKCMW6GR39l4nJqU9EDyU=", false, function() {
+_s(Sidebar, "sQmMiPnv4623eJ5/oRBAr7p3q5c=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$theme$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTheme"],
         __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$language$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useLanguage"],
@@ -3643,6 +3733,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$search$2d$moda
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$settings$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/settings-modal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$account$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/account-modal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/contexts/auth-context.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -3653,12 +3745,27 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
+;
 function ChatPage() {
     _s();
+    const { user, isLoading } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const [showSearch, setShowSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showSettings, setShowSettings] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showAccount, setShowAccount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [sidebarOpen, setSidebarOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "ChatPage.useEffect": ()=>{
+            if (!isLoading && !user) {
+                router.push("/login");
+            }
+        }
+    }["ChatPage.useEffect"], [
+        user,
+        isLoading,
+        router
+    ]);
     // Keyboard shortcuts
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "ChatPage.useEffect": ()=>{
@@ -3681,6 +3788,16 @@ function ChatPage() {
             })["ChatPage.useEffect"];
         }
     }["ChatPage.useEffect"], []);
+    if (isLoading) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex h-screen items-center justify-center bg-background",
+            children: "Loading..."
+        }, void 0, false, {
+            fileName: "[project]/app/chat/page.tsx",
+            lineNumber: 45,
+            columnNumber: 12
+        }, this);
+    }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$chat$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChatProvider"], {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "flex h-[100dvh] overflow-hidden bg-background",
@@ -3693,7 +3810,7 @@ function ChatPage() {
                     onOpenAccount: ()=>setShowAccount(true)
                 }, void 0, false, {
                     fileName: "[project]/app/chat/page.tsx",
-                    lineNumber: 37,
+                    lineNumber: 51,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -3703,12 +3820,12 @@ function ChatPage() {
                         sidebarOpen: sidebarOpen
                     }, void 0, false, {
                         fileName: "[project]/app/chat/page.tsx",
-                        lineNumber: 45,
+                        lineNumber: 59,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/chat/page.tsx",
-                    lineNumber: 44,
+                    lineNumber: 58,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$search$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SearchModal"], {
@@ -3716,7 +3833,7 @@ function ChatPage() {
                     onClose: ()=>setShowSearch(false)
                 }, void 0, false, {
                     fileName: "[project]/app/chat/page.tsx",
-                    lineNumber: 48,
+                    lineNumber: 62,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$settings$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SettingsModal"], {
@@ -3724,7 +3841,7 @@ function ChatPage() {
                     onClose: ()=>setShowSettings(false)
                 }, void 0, false, {
                     fileName: "[project]/app/chat/page.tsx",
-                    lineNumber: 49,
+                    lineNumber: 63,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$account$2d$modal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AccountModal"], {
@@ -3732,22 +3849,27 @@ function ChatPage() {
                     onClose: ()=>setShowAccount(false)
                 }, void 0, false, {
                     fileName: "[project]/app/chat/page.tsx",
-                    lineNumber: 50,
+                    lineNumber: 64,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/chat/page.tsx",
-            lineNumber: 36,
+            lineNumber: 50,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/chat/page.tsx",
-        lineNumber: 35,
+        lineNumber: 49,
         columnNumber: 5
     }, this);
 }
-_s(ChatPage, "RrN3ZTG08lGVnCUmH8OXMVtOQkQ=");
+_s(ChatPage, "9jugVBxdG0rMlpVdTf3ieFU118k=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$contexts$2f$auth$2d$context$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+    ];
+});
 _c = ChatPage;
 var _c;
 __turbopack_context__.k.register(_c, "ChatPage");

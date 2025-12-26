@@ -680,6 +680,10 @@
     height: 100%;
   }
 
+  .h-screen {
+    height: 100vh;
+  }
+
   .max-h-\[60vh\] {
     max-height: 60vh;
   }

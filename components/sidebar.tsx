@@ -28,6 +28,7 @@ import {
   Bot,
   Edit2,
   Globe,
+  Download,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
@@ -59,6 +60,7 @@ export function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpen
     selectConversation,
     deleteConversation,
     renameConversation,
+    downloadChatHistory,
   } = useChat()
   const { signOut, profile } = useAuth()
   const router = useRouter()
@@ -237,6 +239,16 @@ export function Sidebar({ isOpen, onToggle, onOpenSearch, onOpenSettings, onOpen
                         title={t("rename")}
                       >
                         <Edit2 className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          downloadChatHistory(conversation.id)
+                        }}
+                        className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        title="Download history"
+                      >
+                        <Download className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={(e) => {

@@ -9,13 +9,13 @@ export function getSupabaseBrowserClient() {
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Supabase URL va ANON KEY .env faylida topilmadi");
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase URL va PUBLISHABLE KEY .env faylida topilmadi");
   }
 
-  browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
-  
+  browserClient = createBrowserClient(supabaseUrl, supabaseKey);
+
   return browserClient;
 }

@@ -7,12 +7,22 @@ import { SearchModal } from "@/components/search-modal"
 import { SettingsModal } from "@/components/settings-modal"
 import { AccountModal } from "@/components/account-modal"
 import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 export default function ChatPage() {
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
   const [showSearch, setShowSearch] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showAccount, setShowAccount] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login")
+    }
+  }, [user, isLoading, router])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -30,6 +40,10 @@ export default function ChatPage() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
+
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center bg-background">Loading...</div>
+  }
 
   return (
     <ChatProvider>

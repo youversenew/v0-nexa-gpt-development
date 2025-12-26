@@ -14,7 +14,6 @@ module.exports = mod;
 "[project]/lib/supabase/middleware.ts [middleware-edge] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-// lib/supabase/middleware.ts
 __turbopack_context__.s([
     "updateSession",
     ()=>updateSession
@@ -26,55 +25,39 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 async function updateSession(request) {
-    // 1. Dastlabki response
     let response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
         request: {
             headers: request.headers
         }
     });
-    // 2. Supabase klientini yaratamiz (ANON KEY bilan)
-    const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co"), ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5cHdlcXBmanBwa3N6anZveXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMzMxNjcsImV4cCI6MjA4MTYwOTE2N30.bJPV8KYrmKNsO7Bv2bpgCtO9zBsCTAJ8Nxb2VnJTaIU"), {
+    const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co"), ("TURBOPACK compile-time value", "sb_publishable_o6tiU8SKYXbxJ6mJ7ikmHg_3Dmj7TDg"), {
         cookies: {
             getAll () {
                 return request.cookies.getAll();
             },
             setAll (cookiesToSet) {
-                // Cookielarni requestga yozamiz
                 cookiesToSet.forEach(({ name, value })=>{
                     request.cookies.set(name, value);
                 });
-                // Responseni yangilaymiz
                 response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
                     request
                 });
-                // Cookielarni responsega ham yozamiz
                 cookiesToSet.forEach(({ name, value, options })=>{
                     response.cookies.set(name, value, options);
                 });
             }
         }
     });
-    // 3. Foydalanuvchini tekshiramiz
+    // IMPORTANT: DO NOT REMOVE auth.getUser()
     const { data: { user } } = await supabase.auth.getUser();
-    // 4. Himoyalangan yo'llar
-    const protectedPaths = [
-        "/chat",
-        "/settings",
-        "/account"
-    ];
-    const isProtectedPath = protectedPaths.some((path)=>request.nextUrl.pathname.startsWith(path));
-    if (isProtectedPath && !user) {
+    const isAuthPage = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/signup");
+    const isProtectedPage = request.nextUrl.pathname.startsWith("/chat") || request.nextUrl.pathname.startsWith("/account");
+    if (!user && isProtectedPage) {
         const url = request.nextUrl.clone();
         url.pathname = "/login";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(url);
     }
-    // 5. Auth sahifalari (Login/Signup)
-    const authPaths = [
-        "/login",
-        "/signup"
-    ];
-    const isAuthPath = authPaths.some((path)=>request.nextUrl.pathname.startsWith(path));
-    if (isAuthPath && user) {
+    if (user && isAuthPage) {
         const url = request.nextUrl.clone();
         url.pathname = "/chat";
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(url);

@@ -90,10 +90,11 @@ function getSupabaseBrowserClient() {
     if (browserClient) {
         return browserClient;
     }
-    const supabaseUrl = ("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co");
-    const supabaseAnonKey = ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5cHdlcXBmanBwa3N6anZveXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMzMxNjcsImV4cCI6MjA4MTYwOTE2N30.bJPV8KYrmKNsO7Bv2bpgCtO9zBsCTAJ8Nxb2VnJTaIU");
-    if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
-    ;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error("Supabase URL va ANON KEY .env faylida topilmadi");
+    }
     browserClient = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createBrowserClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createBrowserClient"])(supabaseUrl, supabaseAnonKey);
     return browserClient;
 }

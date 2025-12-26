@@ -1,50 +1,56 @@
-[00:00:01.914] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:02.075] Server  LOG      ✓ Ready in 1700ms
-[00:00:07.222] Server  LOG      ○ Compiling /chat ...
-[00:00:12.143] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:18.556] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:24.972] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\.next\dev\server\chunks\node_modules_7fc1ee49._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:24.981] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\.next\dev\server\chunks\[root-of-the-server]__6881003e._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:24.993] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:24.996] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:24.998] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:25.002] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:25.005] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:25.008] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:25.010] Server  ERROR   C:\Users\1234\Desktop\web\v0-nexa-gpt-development\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:25.013] Server  ERROR   [v0] Title generation error: Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
-* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
-* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash
-* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash
-Please retry in 42.52715153s. [{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Learn more about Gemini API quotas","url":"https://ai.google.dev/gemini-api/docs/rate-limits"}]},{"@type":"type.googleapis.com/google.rpc.QuotaFailure","violations":[{"quotaMetric":"generativelanguage.googleapis.com/generate_content_free_tier_requests","quotaId":"GenerateRequestsPerDayPerProjectPerModel-FreeTier","quotaDimensions":{"location":"global","model":"gemini-2.0-flash"}},{"quotaMetric":"generativelanguage.googleapis.com/generate_content_free_tier_requests","quotaId":"GenerateRequestsPerMinutePerProjectPerModel-FreeTier","quotaDimensions":{"location":"global","model":"gemini-2.0-flash"}},{"quotaMetric":"generativelanguage.googleapis.com/generate_content_free_tier_input_token_count","quotaId":"GenerateContentInputTokensPerModelPerMinute-FreeTier","quotaDimensions":{"model":"gemini-2.0-flash","location":"global"}}]},{"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"42s"}]
-[00:13:16.041] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:14:10.003] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:15:35.379] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:15:47.763] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:17:26.835] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./lib/supabase/client.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:17:26.864] Server  LOG      ✓ Compiled in 536ms
-[00:17:28.739] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:17:40.948] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./contexts/auth-context.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:17:41.180] Server  LOG      ✓ Compiled in 789ms
-[00:17:42.822] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:17:49.633] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./contexts/auth-context.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:17:49.658] Server  LOG      ✓ Compiled in 189ms
-[00:17:51.605] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:17:53.583] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./lib/supabase/client.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:17:53.608] Server  LOG      ✓ Compiled in 44ms
-[00:17:55.035] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:19:49.514] Server  LOG      ✓ Compiled in 30ms
-[00:19:57.072] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./lib/supabase/client.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:19:57.150] Server  LOG      ✓ Compiled in 42ms
-[00:19:59.423] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:20:02.955] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:20:07.732] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:20:12.838] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:21:03.891] Server  WARN     ⚠ Fast Refresh had to perform a full reload when ./lib/supabase/client.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:21:03.938] Server  LOG      ✓ Compiled in 50ms
-[00:21:06.575] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:21:23.129] Server  LOG      ✓ Compiled in 24ms
-[00:21:26.256] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:21:31.741] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:22:25.163] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:23:06.400] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:00.962] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:01.093] Server  LOG      ✓ Ready in 782ms
+[00:00:05.267] Server  LOG      ○ Compiling /chat ...
+[00:00:09.163] Server  WARN     ⚠ Cross origin request detected from 192.168.1.45 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[00:00:09.190] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:32.890] Browser ERROR   unhandledRejection: TypeError: crypto.randomUUID is not a function
+[00:01:07.613] Browser ERROR   unhandledRejection: TypeError: crypto.randomUUID is not a function
+[00:01:07.828] Browser ERROR   unhandledRejection: TypeError: crypto.randomUUID is not a function
+[00:01:29.833] Server  LOG      ✓ Compiled in 124ms
+[00:01:30.764] Browser ERROR   ./contexts/chat-context.tsx:145:3
+Parsing ecmascript source code failed
+  143 |       setConversations((prev) =>
+  144 |
+> 145 |   const clearAllConversations = useCallback(async () => {
+      |   ^^^^^
+  146 |         if (!user) return;
+  147 |         await supabase.from("conversations").delete().eq("user_id", user.id);
+  148 |         setConversations([]);
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./contexts/chat-context.tsx [Client Component Browser]
+    ./app/chat/page.tsx [Client Component Browser]
+    ./app/chat/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./contexts/chat-context.tsx [Client Component SSR]
+    ./app/chat/page.tsx [Client Component SSR]
+    ./app/chat/page.tsx [Server Component]
+[00:02:18.969] Server  LOG      ✓ Compiled in 78ms
+[00:02:44.246] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:04:06.353] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:27.985] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:32.635] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:45.698] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:50.988] Browser ERROR   Auth initialization error: {}
+[00:06:14.782] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:09:06.454] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:09:11.606] Browser ERROR   Auth initialization error: {}
+[00:09:26.929] Server  ERROR   Error: fetch failed
+    at context.fetch (C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\node_modules\next\dist\server\web\sandbox\context.js:322:60)
+    at C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:577:23
+    at _handleRequest (C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:931:24)
+    at _request (C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:918:24)
+    at C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:4152:225
+    at SupabaseAuthClient._useSession (C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:4021:26)
+    at async SupabaseAuthClient._getUser (C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:4137:20)
+    at async C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:4121:20
+    at async C:\Users\KOMPYUTER_01\v0-nexa-gpt-development\.next\dev\server\edge\chunks\node_modules_@supabase_auth-js_dist_module_33c852e9._.js:3969:28 {
+  
+}
+[00:09:29.521] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:09:35.763] Browser ERROR   Auth initialization error: {}

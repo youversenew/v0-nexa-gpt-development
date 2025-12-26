@@ -1,5 +1,14 @@
 export type ModuleSlug = "nexagpt" | "agro" | "code" | "weather" | "health" | "shop" | "statistics" | "profile"
 
+export interface ModuleLayout {
+  type: string
+  actions?: {
+    type: string
+    label: string
+    icon: string
+  }[]
+}
+
 export interface Module {
   id: string
   name: string
@@ -14,14 +23,18 @@ export interface Module {
   welcome_message?: string
   features?: string[]
   is_active: boolean
+
   sort_order?: number
+  layout?: ModuleLayout
 }
 
 export interface Conversation {
   id: string
   user_id: string
   module_slug: string | null
+
   title: string
+  custom_title?: string
   is_pinned?: boolean
   created_at: string
   updated_at: string

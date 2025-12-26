@@ -12,18 +12,19 @@ __turbopack_context__.n(__turbopack_context__.i("[project]/app/layout.tsx [app-r
 "[project]/lib/supabase/server.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+// lib/supabase/server.ts
 __turbopack_context__.s([
-    "getSupabaseServerClient",
-    ()=>getSupabaseServerClient
+    "createClient",
+    ()=>createClient
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/@supabase/ssr/dist/module/index.js [app-rsc] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@supabase/ssr/dist/module/createServerClient.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/headers.js [app-rsc] (ecmascript)");
 ;
 ;
-async function getSupabaseServerClient() {
+async function createClient() {
     const cookieStore = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$headers$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["cookies"])();
-    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co"), process.env.SUPABASE_ANON_KEY, {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co"), ("TURBOPACK compile-time value", "sb_publishable_o6tiU8SKYXbxJ6mJ7ikmHg_3Dmj7TDg"), {
         cookies: {
             getAll () {
                 return cookieStore.getAll();
@@ -32,7 +33,7 @@ async function getSupabaseServerClient() {
                 try {
                     cookiesToSet.forEach(({ name, value, options })=>cookieStore.set(name, value, options));
                 } catch  {
-                // Server component, cookies are read-only
+                // Server Componentlarda cookie yozish mumkin emasligi sababli xatoni yutamiz
                 }
             }
         }
@@ -52,7 +53,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$server$2e
 ;
 ;
 async function Home() {
-    const supabase = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$server$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getSupabaseServerClient"])();
+    const supabase = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$supabase$2f$server$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createClient"])();
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$components$2f$navigation$2e$react$2d$server$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["redirect"])("/chat");

@@ -91,10 +91,10 @@ function getSupabaseBrowserClient() {
         return browserClient;
     }
     const supabaseUrl = ("TURBOPACK compile-time value", "https://hypweqpfjppkszjvoywt.supabase.co");
-    const supabaseAnonKey = ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5cHdlcXBmanBwa3N6anZveXd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMzMxNjcsImV4cCI6MjA4MTYwOTE2N30.bJPV8KYrmKNsO7Bv2bpgCtO9zBsCTAJ8Nxb2VnJTaIU");
+    const supabaseKey = ("TURBOPACK compile-time value", "sb_publishable_o6tiU8SKYXbxJ6mJ7ikmHg_3Dmj7TDg");
     if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
     ;
-    browserClient = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createBrowserClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createBrowserClient"])(supabaseUrl, supabaseAnonKey);
+    browserClient = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createBrowserClient$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createBrowserClient"])(supabaseUrl, supabaseKey);
     return browserClient;
 }
 }),
@@ -139,14 +139,22 @@ function AuthProvider({ children }) {
         let mounted = true;
         const initializeAuth = async ()=>{
             try {
-                // 1. Hozirgi sessiyani tekshiramiz
-                const { data: { user: currentUser } } = await supabase.auth.getUser();
-                if (mounted) {
-                    setUser(currentUser);
-                    if (currentUser) {
-                        await fetchUserData(currentUser.id);
+                // Enforce max loading time of 5 seconds
+                const timeoutPromise = new Promise((_, reject)=>setTimeout(()=>reject(new Error("Auth timeout")), 5000));
+                // 1. Check current session
+                const authPromise = async ()=>{
+                    const { data: { user: currentUser } } = await supabase.auth.getUser();
+                    if (mounted) {
+                        setUser(currentUser);
+                        if (currentUser) {
+                            await fetchUserData(currentUser.id);
+                        }
                     }
-                }
+                };
+                await Promise.race([
+                    authPromise(),
+                    timeoutPromise
+                ]);
             } catch (error) {
                 console.error("Auth initialization error:", error);
             } finally{
@@ -232,7 +240,7 @@ function AuthProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/contexts/auth-context.tsx",
-        lineNumber: 152,
+        lineNumber: 161,
         columnNumber: 5
     }, this);
 }

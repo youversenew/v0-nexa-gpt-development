@@ -55,15 +55,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        // 1. Hozirgi sessiyani tekshiramiz
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        // Enforce max loading time of 5 seconds
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Auth timeout")), 5000)
+        );
 
-        if (mounted) {
-          setUser(currentUser);
-          if (currentUser) {
-            await fetchUserData(currentUser.id);
+        // 1. Check current session
+        const authPromise = async () => {
+          const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+          if (mounted) {
+            setUser(currentUser);
+            if (currentUser) {
+              await fetchUserData(currentUser.id);
+            }
           }
-        }
+        };
+
+        await Promise.race([authPromise(), timeoutPromise]);
       } catch (error) {
         console.error("Auth initialization error:", error);
       } finally {
@@ -75,16 +84,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 2. Auth o'zgarishlarini tinglaymiz
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         if (!mounted) return;
-        
+
         const currentUser = session?.user ?? null;
         setUser(currentUser);
 
         if (currentUser) {
           // Faqat user o'zgarganda qayta yuklash
           if (user?.id !== currentUser.id) {
-             await fetchUserData(currentUser.id);
+            await fetchUserData(currentUser.id);
           }
         } else {
           setProfile(null);

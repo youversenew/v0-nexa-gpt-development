@@ -2,5 +2,5 @@
   "version": 3,
   "sources": [],
   "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/1234/Desktop/web/v0-nexa-gpt-development/app/chat/loading.tsx"],"sourcesContent":["export default function Loading() {\r\n  return null\r\n}\r\n"],"names":[],"mappings":";;;;AAAe,SAAS;IACtB,OAAO;AACT"}}]
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/KOMPYUTER_01/v0-nexa-gpt-development/app/chat/loading.tsx"],"sourcesContent":["export default function Loading() {\r\n  return null\r\n}\r\n"],"names":[],"mappings":";;;;AAAe,SAAS;IACtB,OAAO;AACT"}}]
 }
